@@ -23,6 +23,9 @@
     "esp_io_expander_tca95xx_16bit.h": "c",
     "err.h": "c",
     "i2c.h": "c",
-    "i2c_types.h": "c"
+    "i2c_types.h": "c",
+    "esp_lcd_panel_io_additions.h": "c",
+    "esp_lcd_types.h": "c",
+    "esp_io_expander.h": "c"
   }
 }
