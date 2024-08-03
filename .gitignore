@@ -1,2 +1,6 @@
-*/build
-*/managed_components
+**/build
+**/managed_components
+
+# It's only worthwhile to store the sdkconfig.defaults
+**/sdkconfig
+**/sdkconfig.old
