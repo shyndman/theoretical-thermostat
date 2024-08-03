@@ -17,6 +17,7 @@
 
 #include "nvs_flash.h"
 #include "esp_io_expander_tca95xx_16bit.h"
+#include "esp_lcd_panel_io_additions.h"
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -116,15 +117,15 @@ void wifi_init_sta(void)
     esp_event_handler_instance_t instance_any_id;
     esp_event_handler_instance_t instance_got_ip;
     ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
-                                                        ESP_EVENT_ANY_ID,
-                                                        &event_handler,
-                                                        NULL,
-                                                        &instance_any_id));
+                    ESP_EVENT_ANY_ID,
+                    &event_handler,
+                    NULL,
+                    &instance_any_id));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT,
-                                                        IP_EVENT_STA_GOT_IP,
-                                                        &event_handler,
-                                                        NULL,
-                                                        &instance_got_ip));
+                    IP_EVENT_STA_GOT_IP,
+                    &event_handler,
+                    NULL,
+                    &instance_got_ip));
 
     wifi_config_t wifi_config = {
         .sta = {
@@ -204,14 +205,42 @@ void app_main(void)
         .master.clk_speed = I2C_MASTER_FREQ_HZ, // select frequency specific to your project
         // .clk_flags = 0,          /*!< Optional, you can use I2C_SCLK_SRC_FLAG_* flags to choose i2c source clock here. */
     };
-    i2c_param_config(i2c_port, &i2c_conf);
-    i2c_driver_install(i2c_port, i2c_conf.mode, I2C_RX_BUF_DISABLE, I2C_TX_BUF_DISABLE, 0);
+    ESP_ERROR_CHECK(i2c_param_config(i2c_port, &i2c_conf));
+    ESP_ERROR_CHECK(i2c_driver_install(i2c_port, i2c_conf.mode, I2C_RX_BUF_DISABLE, I2C_TX_BUF_DISABLE, 0));
 
     esp_io_expander_handle_t io_expander = NULL;
-    esp_io_expander_new_i2c_tca95xx_16bit(i2c_port, ESP_IO_EXPANDER_I2C_TCA9555_ADDRESS_000, &io_expander);
+    ESP_ERROR_CHECK(esp_io_expander_new_i2c_tca95xx_16bit(i2c_port, ESP_IO_EXPANDER_I2C_TCA9555_ADDRESS_000, &io_expander));
+    ESP_LOGI(TAG, "XL9535 found");
 
-    esp_io_expander_set_dir(io_expander, IO_EXPANDER_PIN_NUM_0 | IO_EXPANDER_PIN_NUM_1 | IO_EXPANDER_PIN_NUM_13, IO_EXPANDER_OUTPUT);
-    esp_io_expander_set_level(io_expander, IO_EXPANDER_PIN_NUM_0 | IO_EXPANDER_PIN_NUM_1, 0);
+    // Set up 3-wire SPI for display command channel
 
+    spi_line_config_t spi_line = {
+        .cs_io_type = IO_TYPE_EXPANDER,
+        .cs_gpio_num = IO_EXPANDER_PIN_NUM_17,
+        .scl_io_type = IO_TYPE_EXPANDER,
+        .scl_gpio_num = IO_EXPANDER_PIN_NUM_15,
+        .sda_io_type = IO_TYPE_EXPANDER,
+        .sda_gpio_num = IO_EXPANDER_PIN_NUM_16,
+        .io_expander = io_expander, // Created by the user
+    };
+    esp_lcd_panel_io_3wire_spi_config_t io_config = {
+        .line_config = spi_line,
+        .expect_clk_speed = PANEL_IO_3WIRE_SPI_CLK_MAX,
+        // All settings confirmed
+        .spi_mode = 0,
+        .lcd_cmd_bytes = 1,
+        .lcd_param_bytes = 1,
+        .flags = {
+            .use_dc_bit = 1,
+            .dc_zero_on_data = 0,
+            .lsb_first = 0,
+            .cs_high_active = 0,
+            .del_keep_cs_inactive = 0,
+        },
+    };
+    esp_lcd_panel_io_handle_t panel_io = NULL;
+    ESP_ERROR_CHECK(esp_lcd_new_panel_io_3wire_spi(&io_config, &panel_io));
+
+    // Log state
     esp_io_expander_print_state(io_expander);
 }
