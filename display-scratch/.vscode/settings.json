@@ -13,19 +13,4 @@
   "idf.port": "/dev/ttyACM0",
   "idf.pythonBinPath": "/home/shyndman/.espressif/python_env/idf5.3_py3.12_env/bin/python",
   "idf.toolsPath": "/home/shyndman/.espressif",
-  "files.associations": {
-    "*.felt": "dart",
-    "*.css": "scss",
-    "*.njk": "html",
-    "latest_test_server_url": "dart",
-    "*.maxpat": "json",
-    ".dev.dotenv": "shellscript",
-    "esp_io_expander_tca95xx_16bit.h": "c",
-    "err.h": "c",
-    "i2c.h": "c",
-    "i2c_types.h": "c",
-    "esp_lcd_panel_io_additions.h": "c",
-    "esp_lcd_types.h": "c",
-    "esp_io_expander.h": "c"
-  }
 }
