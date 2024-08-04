@@ -13,4 +13,16 @@
   "idf.port": "/dev/ttyACM0",
   "idf.pythonBinPath": "/home/shyndman/.espressif/python_env/idf5.3_py3.12_env/bin/python",
   "idf.toolsPath": "/home/shyndman/.espressif",
+  "files.associations": {
+    "*.felt": "dart",
+    "*.css": "scss",
+    "*.njk": "html",
+    "latest_test_server_url": "dart",
+    "*.maxpat": "json",
+    ".dev.dotenv": "shellscript",
+    "event_groups.h": "c",
+    "esp_system.h": "c"
+  },
+  "astyle-format.args": "--style=otbs --attach-namespaces --attach-classes --indent=spaces=4 --convert-tabs --align-reference=name --keep-one-line-statements --pad-header --pad-oper --unpad-paren --max-continuation-indent=120",
+  "astyle-format.path": "astyle",
 }
