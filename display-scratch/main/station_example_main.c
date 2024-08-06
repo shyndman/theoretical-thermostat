@@ -25,7 +25,7 @@
 
 #include "type_9_init_cmds.h"
 
-static const char *TAG = "lcd-display";
+static const char *TAG = "display-scratch";
 
 #define I2C_MASTER_SDA_IO 17
 #define I2C_MASTER_SCL_IO 18
