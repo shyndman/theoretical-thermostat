@@ -33,6 +33,10 @@ static const char *TAG = "display-scratch";
 #define I2C_TX_BUF_DISABLE 0          // I2C master do not need buffer
 #define I2C_RX_BUF_DISABLE 0          // I2C master do not need buf`fer
 
+#define EXPANDER_CS_IO IO_EXPANDER_PIN_NUM_15 // IO_EXPANDER_PIN_NUM_17
+#define EXPANDER_SCL_IO IO_EXPANDER_PIN_NUM_13 // IO_EXPANDER_PIN_NUM_15
+#define EXPANDER_SDA_IO IO_EXPANDER_PIN_NUM_14 // IO_EXPANDER_PIN_NUM_16
+
 #define LCD_PCLK_IO 41
 #define LCD_VSYNC_IO 40
 #define LCD_HSYNC_IO 39
@@ -90,43 +94,31 @@ void app_main(void)
         .scl_io_num = I2C_MASTER_SCL_IO, // select GPIO specific to your project
         .scl_pullup_en = GPIO_PULLUP_ENABLE,
         .master.clk_speed = I2C_MASTER_FREQ_HZ, // select frequency specific to your project
-        // .clk_flags = 0,          /*!< Optional, you can use I2C_SCLK_SRC_FLAG_* flags to choose i2c source clock here. */
     };
     ESP_ERROR_CHECK(i2c_param_config(i2c_port, &i2c_conf));
     ESP_ERROR_CHECK(i2c_driver_install(i2c_port, i2c_conf.mode, I2C_RX_BUF_DISABLE, I2C_TX_BUF_DISABLE, 0));
 
+    ESP_LOGI(TAG, " %u", I2C_NUM_1);
     esp_io_expander_handle_t io_expander = NULL;
     ESP_ERROR_CHECK(esp_io_expander_new_i2c_tca95xx_16bit(i2c_port, ESP_IO_EXPANDER_I2C_TCA9555_ADDRESS_000, &io_expander));
-    ESP_LOGI(TAG, "XL9535 found");
-    ESP_LOGI(TAG, "Resetting");
-    // esp_io_expander_print_state(io_expander);
-    ESP_ERROR_CHECK(io_expander->reset(io_expander));
-    // esp_io_expander_print_state(io_expander);
-    // ESP_LOGI(TAG, "Configuring as all output");
-    // ESP_ERROR_CHECK(io_expander->write_direction_reg(io_expander, 0x0000));
-    // esp_io_expander_print_state(io_expander);
-    // ESP_LOGI(TAG, "Configuring a couple as inputs");
-    // ESP_ERROR_CHECK(esp_io_expander_set_dir(io_expander, IO_EXPANDER_PIN_NUM_14, IO_EXPANDER_INPUT));
-    // ESP_ERROR_CHECK(esp_io_expander_set_dir(io_expander, IO_EXPANDER_PIN_NUM_4, IO_EXPANDER_INPUT));
-    // ESP_ERROR_CHECK(esp_io_expander_set_dir(io_expander, IO_EXPANDER_PIN_NUM_2, IO_EXPANDER_INPUT));
-    // esp_io_expander_print_state(io_expander);
 
-    // Set up 3-wire SPI for display command channel
+    ESP_LOGI(TAG, "Configuring as all input");
+    ESP_ERROR_CHECK(io_expander->write_direction_reg(io_expander, 0xffff));
+    esp_io_expander_print_state(io_expander);
 
     ESP_LOGI(TAG, "Configuring three wire command SPI");
     spi_line_config_t spi_line = {
         .cs_io_type = IO_TYPE_EXPANDER,
-        .cs_expander_pin = IO_EXPANDER_PIN_NUM_17,
+        .cs_expander_pin = EXPANDER_CS_IO,
         .scl_io_type = IO_TYPE_EXPANDER,
-        .scl_expander_pin = IO_EXPANDER_PIN_NUM_15,
+        .scl_expander_pin = EXPANDER_SCL_IO,
         .sda_io_type = IO_TYPE_EXPANDER,
-        .sda_expander_pin = IO_EXPANDER_PIN_NUM_16,
+        .sda_expander_pin = EXPANDER_SDA_IO,
         .io_expander = io_expander, // Created by the user
     };
     esp_lcd_panel_io_3wire_spi_config_t io_config = ST7701_PANEL_IO_3WIRE_SPI_CONFIG(spi_line, false);
     esp_lcd_panel_io_handle_t panel_io = NULL;
     ESP_ERROR_CHECK(esp_lcd_new_panel_io_3wire_spi(&io_config, &panel_io));
-
     ESP_ERROR_CHECK(esp_io_expander_print_state(io_expander));
 
     ESP_LOGI(TAG, "Install ST7701 panel driver");
