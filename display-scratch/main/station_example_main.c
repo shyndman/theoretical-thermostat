@@ -29,7 +29,7 @@ static const char *TAG = "display-scratch";
 
 #define I2C_MASTER_SDA_IO 17
 #define I2C_MASTER_SCL_IO 18
-#define I2C_MASTER_FREQ_HZ 400 * 1000 // 400kHz is the max speed of the XL9535
+#define I2C_MASTER_FREQ_HZ 100 * 1000 // 100Hz is a safe speed, and is used by Lilygo
 #define I2C_TX_BUF_DISABLE 0          // I2C master do not need buffer
 #define I2C_RX_BUF_DISABLE 0          // I2C master do not need buf`fer
 
