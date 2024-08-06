@@ -6,10 +6,10 @@ dependencies:
       type: service
     version: 0.5.3
   espressif/esp_io_expander:
-    component_hash: fbc0de4082fc7c207dc98a93a0ed83d1a929a4ecee83cc567afb406f3ee6d4a6
+    component_hash: null
     source:
-      service_url: https://api.components.espressif.com/
-      type: service
+      path: /home/shyndman/dev/theoretical-thermostat/display-scratch/components/espressif__esp_io_expander
+      type: local
     version: 1.0.1
   espressif/esp_io_expander_tca95xx_16bit:
     component_hash: 9de8aee60baa02e77283dfdaf0fe3cba31f2731320d192c8ed933267090f8f54
@@ -34,6 +34,6 @@ dependencies:
     source:
       type: idf
     version: 5.3.0
-manifest_hash: 2fe2b44415f99b740d3d79e547bad9b2358f4898e814b882202bfecad9b27a79
+manifest_hash: 258254df384b021f479f5ce558d1bd4602ad757c8309d2901d5ea232307704b8
 target: esp32s3
 version: 1.0.0
