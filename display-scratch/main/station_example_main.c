@@ -21,6 +21,7 @@
 #include "esp_lcd_st7701.h"
 #include "lwip/err.h"
 #include "lwip/sys.h"
+#include "driver/ledc.h"
 
 #include "type_9_init_cmds.h"
 
@@ -55,22 +56,32 @@ static const char *TAG = "lcd-display";
 
 #define LCD_IO_UNUSED -1
 
+#define BACKLIGHT_TIMER_RESOLUTION LEDC_TIMER_8_BIT
+
 void app_main(void)
 {
-    // Initialize NVS
-    // esp_err_t ret = nvs_flash_init();
-    // if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
-    // {
-    //     ESP_ERROR_CHECK(nvs_flash_erase());
-    //     ret = nvs_flash_init();
-    // }
-    // ESP_ERROR_CHECK(ret);
+    ESP_LOGI(TAG, "Configuring backlight");
+    gpio_set_direction(LCD_BL_IO, TCP_OUTPUT_DEBUG);
+    gpio_set_level(LCD_BL_IO, 0);
 
-    // ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
-    // wifi_init_sta();
+    ledc_timer_config_t backlight_timer_config = {
+        .timer_num = LEDC_TIMER_0,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .clk_cfg = LEDC_USE_XTAL_CLK,
+        .duty_resolution = BACKLIGHT_TIMER_RESOLUTION,
+        .freq_hz = 40000,
+    };
+    ESP_ERROR_CHECK(ledc_timer_config(&backlight_timer_config));
+    ledc_channel_config_t backlight_channel_config = {
+        .gpio_num = LCD_BL_IO,
+        .channel = LEDC_CHANNEL_0,
+        .timer_sel = LEDC_TIMER_0,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .duty = (1 << (BACKLIGHT_TIMER_RESOLUTION - 1)) + (BACKLIGHT_TIMER_RESOLUTION - 1),
+    };
+    ESP_ERROR_CHECK(ledc_channel_config(&backlight_channel_config));
 
-    // Setup XL9535 IO expander
-
+    ESP_LOGI(TAG, "Configuring I2C port %u", I2C_NUM_1);
     i2c_port_t i2c_port = I2C_NUM_1;
     i2c_config_t i2c_conf = {
         .mode = I2C_MODE_MASTER,
